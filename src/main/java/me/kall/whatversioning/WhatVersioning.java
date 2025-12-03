@@ -1,10 +1,20 @@
 package me.kall.whatversioning;
 
 import com.google.common.collect.Lists;
+import com.mojang.blaze3d.platform.InputConstants;
 import me.kall.duplicationless.config.JsonConfig;
+import net.minecraft.client.KeyMapping;
+import net.minecraft.client.Minecraft;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.ClientRegistry;
+import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import org.lwjgl.glfw.GLFW;
 
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Mod(WhatVersioning.MOD_ID)
 public final class WhatVersioning {
@@ -19,7 +29,7 @@ public final class WhatVersioning {
                     "Minecraft mojang is retarded",
                     "Minecraft 26.2",
                     "Minecraft MoForce 576.08",
-                    "Minecraft4™",
+                    "Minecraft 4™",
                     "Minecraft CopperLake",
                     "Minecraft i25-18900kx",
                     "Minecraft 42.7.04",
@@ -40,4 +50,32 @@ public final class WhatVersioning {
             .initialize();
 
     public static final List<String> VERSIONS = CONFIG.getList("CustomVersioning", String.class);
+
+    public static String CURRENT = VERSIONS.get(ThreadLocalRandom.current().nextInt(VERSIONS.size()));
+
+    public static final KeyMapping CHANGE_TITLE = new KeyMapping(
+            "key.whatversioning.change_title",
+            InputConstants.Type.KEYSYM,
+            GLFW.GLFW_KEY_F9,
+            "category.whatversioning.title"
+    );
+
+    @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT, modid = MOD_ID)
+    public static final class ModEvents {
+        @SubscribeEvent
+        public static void key(FMLClientSetupEvent event) {
+            event.enqueueWork(() -> ClientRegistry.registerKeyBinding(CHANGE_TITLE));
+        }
+    }
+
+    @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT, modid = MOD_ID)
+    public static final class ForgeEvents {
+        @SubscribeEvent
+        public static void tick(TickEvent.ClientTickEvent event) {
+            if (event.phase.equals(TickEvent.Phase.END) && CHANGE_TITLE.consumeClick()) {
+                CURRENT = VERSIONS.get(ThreadLocalRandom.current().nextInt(VERSIONS.size()));
+                Minecraft.getInstance().updateTitle();
+            }
+        }
+    }
 }
