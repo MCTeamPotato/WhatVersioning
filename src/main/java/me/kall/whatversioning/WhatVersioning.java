@@ -2,7 +2,7 @@ package me.kall.whatversioning;
 
 import com.google.common.collect.Lists;
 import me.kall.duplicationless.config.JsonConfig;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.fml.common.Mod;
 
 import java.util.List;
 
