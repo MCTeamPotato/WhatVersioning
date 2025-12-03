@@ -6,10 +6,11 @@ import me.kall.duplicationless.config.JsonConfig;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
+import net.minecraftforge.client.ClientRegistry;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.List;
@@ -62,8 +63,8 @@ public final class WhatVersioning {
     @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT, modid = MOD_ID)
     public static final class ModEvents {
         @SubscribeEvent
-        public static void key(RegisterKeyMappingsEvent event) {
-            event.register(CHANGE_TITLE);
+        public static void key(FMLClientSetupEvent event) {
+            event.enqueueWork(() -> ClientRegistry.registerKeyBinding(CHANGE_TITLE));
         }
     }
 
